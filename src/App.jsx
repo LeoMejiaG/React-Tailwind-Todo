@@ -1,81 +1,88 @@
-import CrossIcon from "./components/icons/CrossIcon";
-import MoonIcon from "./components/icons/MoonIcon";
-const App = () => {
-    return (
-        <div className="min-h-screen bg-gray-300 bg-[url(./assets/images/bg-mobile-light.jpg)] bg-contain bg-no-repeat">
-            <header className=" container mx-auto px-4 pt-8">
-                <div className=" flex justify-between">
-                    <h1 className="text-3xl font-bold uppercase tracking-[0.3em] text-white">
-                        todo
-                    </h1>
-                    <button>
-                        <MoonIcon />
-                    </button>
-                </div>
-                <form className="mt-8 flex items-center gap-4 overflow-hidden rounded-md bg-white px-4 py-4">
-                    <span className="inline-block h-5 w-5 rounded-full border-2"></span>
-                    <input
-                        type="text"
-                        placeholder="Crea un nuevo todo..."
-                        className="w-full text-gray-400 outline-none"
-                    />
-                </form>
-            </header>
-            <main className=" container mx-auto mt-8 px-4">
-                <div className="rounded-md border-b-gray-400 bg-white [&>article]:p-4">
-                    <article
-                        className="flex gap-4 border-b border-b-gray-400
-                    "
-                    >
-                        <button className="inline-block h-5 w-5 flex-none rounded-full border-2"></button>
-                        <p className="grow text-gray-600">
-                            Informacion relevante
-                        </p>
-                        <button className="flex-none">
-                            <CrossIcon />
-                        </button>
-                    </article>
-                    <article
-                        className="flex gap-4 border-b border-b-gray-400
-                    "
-                    >
-                        <button className="inline-block h-5 w-5 flex-none rounded-full border-2"></button>
-                        <p className="grow text-gray-600">
-                            Informacion relevante
-                        </p>
-                        <button className="flex-none">
-                            <CrossIcon />
-                        </button>
-                    </article>
-                    <article
-                        className="flex gap-4 border-b border-b-gray-400
-                    "
-                    >
-                        <button className="inline-block h-5 w-5 flex-none rounded-full border-2"></button>
-                        <p className="grow text-gray-600">
-                            Informacion relevante
-                        </p>
-                        <button className="flex-none">
-                            <CrossIcon />
-                        </button>
-                    </article>
+import { useState } from "react";
+import Header from "./components/Header";
+import TodoComputed from "./components/TodoComputed";
+import TodoCreate from "./components/TodoCreate";
+import TodoFilter from "./components/TodoFilter";
+import TodoList from "./components/TodoList";
 
-                    <section className="flex justify-between px-4 py-4 text-gray-400">
-                        <span>5 tareas</span>
-                        <button>Eliminar completadas</button>
-                    </section>
-                </div>
+const initialStateTodos = [
+    { id: 1, title: "Dormir 8 horas", completed: true },
+    { id: 2, title: "Ir al Gym", completed: false },
+    { id: 3, title: "Desayunar", completed: true },
+    { id: 4, title: "Darle comida a los peces", completed: false },
+];
+
+const App = () => {
+    const [todos, setTodos] = useState(initialStateTodos);
+
+    const createTodo = (title) => {
+        const newTodo = {
+            id: Date.now(),
+            title: title.trim(),
+            complete: false,
+        };
+        setTodos([...todos, newTodo]);
+    };
+
+    const removerTodo = (id) => {
+        setTodos(todos.filter((todo) => todo.id !== id));
+    };
+
+    const updateTodo = (id) => {
+        setTodos(
+            todos.map((todo) =>
+                todo.id === id ? { ...todo, completed: !todo.completed } : todo
+            )
+        );
+    };
+
+    const computedItems = todos.filter((todo) => !todo.completed).length;
+
+    const clearCompleted = () => {
+        setTodos(todos.filter((todo) => !todo.completed));
+    };
+
+    const [filter, setFilter] = useState("all");
+
+    const changeFilter = (filter) => setFilter(filter);
+
+    const filterTodos = () => {
+        switch (filter) {
+            case "all":
+                return todos;
+            case "active":
+                return todos.filter((todo) => !todo.completed);
+            case "completed":
+                return todos.filter((todo) => todo.completed);
+            default:
+                return todos;
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-300 bg-[url('./assets/images/bg-mobile-light.jpg')] bg-contain bg-no-repeat dark:bg-gray-900 dark:bg-[url('./assets/images/bg-mobile-dark.jpg')] transition-all duration-1000">
+            <Header />
+
+            <main className=" container mx-auto mt-8 px-4">
+                <TodoCreate createTodo={createTodo} />
+
+                <TodoList
+                    todos={filterTodos()}
+                    removerTodo={removerTodo}
+                    updateTodo={updateTodo}
+                />
+
+                <TodoComputed
+                    computedItems={computedItems}
+                    clearCompleted={clearCompleted}
+                />
+
+                <TodoFilter changeFilter={changeFilter} filter={filter} />
             </main>
-            <section className="container mx-auto mt-8 px-4">
-                <div className="flex justify-center gap-4 rounded-md bg-white p-4 text-gray-400">
-                    <button className="text-blue-600">Todos</button>
-                    <button className="hover:text-blue-600">Activar</button>
-                    <button className="hover:text-blue-600">Completado</button>
-                </div>
-            </section>
-            <p className="mt-8 text-center text-gray-400">
+
+            <footer className="mt-8 text-center text-gray-400 dark:text-gray-400">
                 Arrastrar y soltar para reordenar la lista
-            </p>
+            </footer>
         </div>
     );
 };

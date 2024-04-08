@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-const MoonIcon = ({ fill = "#000", ...props }) => {
+const IconMoon = ({ fill = "#000", ...props }) => {
     return (
         <svg
             {...props}
@@ -16,7 +16,7 @@ const MoonIcon = ({ fill = "#000", ...props }) => {
         </svg>
     );
 };
-MoonIcon.propTypes = {
+IconMoon.propTypes = {
     fill: PropTypes.object,
 };
-export default MoonIcon;
+export default IconMoon;
